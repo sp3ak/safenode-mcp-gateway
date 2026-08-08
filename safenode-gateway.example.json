@@ -1,0 +1,21 @@
+{
+  "failMode": "fail_closed",
+  "payloadMode": "redacted",
+  "timeoutMs": 5000,
+  "logFile": "./safenode-decisions.jsonl",
+  "context": {
+    "environment": "development"
+  },
+  "servers": [
+    {
+      "name": "filesystem",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/your/project"]
+    }
+  ],
+  "tools": {
+    "read_file": { "failMode": "fail_open" },
+    "list_directory": { "failMode": "fail_open" },
+    "write_file": { "payloadMode": "metadata_only" }
+  }
+}

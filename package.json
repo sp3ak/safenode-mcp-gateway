@@ -1,0 +1,62 @@
+{
+  "name": "safenode-mcp-gateway",
+  "version": "0.1.0",
+  "description": "MCP proxy that enforces SafeNode policy on every tool call. The agent cannot route around it.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agents",
+    "agent-security",
+    "guardrails",
+    "policy-engine",
+    "ai-safety",
+    "llm",
+    "llmops",
+    "claude"
+  ],
+  "homepage": "https://safenode.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sp3ak/safenode-mcp-gateway.git"
+  },
+  "bugs": "https://github.com/sp3ak/safenode-mcp-gateway/issues",
+  "license": "MIT",
+  "author": "SafeNode",
+  "type": "module",
+  "bin": {
+    "safenode-mcp-gateway": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "safenode-gateway.example.json",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
