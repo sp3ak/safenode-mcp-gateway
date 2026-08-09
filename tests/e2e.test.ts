@@ -13,16 +13,29 @@
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const root = join(here, '..');
 const gatewayEntry = join(root, 'dist', 'index.js');
 const echoServer = join(root, 'examples', 'echo-server.mjs');
+
+beforeAll(() => {
+  // Without this, a missing build surfaces as "MCP error -32000: Connection closed" from deep
+  // inside the transport, which says nothing about the actual cause. `npm test` builds first via
+  // the pretest hook; this only bites when vitest is invoked directly.
+  if (!existsSync(gatewayEntry)) {
+    throw new Error(
+      `${gatewayEntry} does not exist.\n` +
+        'These tests spawn the compiled gateway as a real subprocess. Run `npm run build` first, ' +
+        'or use `npm test`, which builds automatically.',
+    );
+  }
+});
 
 function writeConfig(overrides: Record<string, unknown>): string {
   const dir = mkdtempSync(join(tmpdir(), 'sn-gw-'));

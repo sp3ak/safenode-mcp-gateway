@@ -15,17 +15,19 @@ jobs:
       matrix:
         node-version: ["18", "20", "22"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      # `npm test` builds first via the pretest hook. The end-to-end tests spawn the compiled
+      # dist/index.js as a real subprocess, so running them against a fresh checkout without
+      # building fails with a misleading "Connection closed".
       - run: npm test
-      - run: npm run build
       # The CLI is the product. A build that compiles but does not run is a broken release —
-      # this is exactly the failure mode that shipped nothing on the first local build.
+      # exactly the failure mode that once shipped a binary producing no output at all.
       - run: node dist/index.js --version
 
   publish:
@@ -37,8 +39,8 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"

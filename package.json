@@ -47,6 +47,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "pretest": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
