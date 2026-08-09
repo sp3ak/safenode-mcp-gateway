@@ -22,6 +22,7 @@ import { randomUUID } from 'node:crypto';
 import { resolveToolSettings } from './config.js';
 import { buildLogEntry, DecisionLog, logToStderr } from './logging.js';
 import { applyFailMode } from './policy.js';
+import { VERSION } from './version.js';
 import type {
   DownstreamServerConfig,
   EvaluationResult,
@@ -256,7 +257,7 @@ async function defaultConnect(
   });
 
   const client = new Client(
-    { name: 'safenode-mcp-gateway', version: '0.1.0' },
+    { name: 'safenode-mcp-gateway', version: VERSION },
     { capabilities: {} },
   );
   await client.connect(transport);

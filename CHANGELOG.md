@@ -9,6 +9,24 @@ While the version is below 1.0.0, minor releases may change the config schema.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-09
+
+No functional change to the gateway itself. Released to verify that publishing works over OIDC
+trusted publishing rather than a long-lived npm token.
+
+### Changed
+
+- Publishes via OIDC trusted publishing. No npm token exists to leak or rotate.
+- The publish job runs Node 24 and pins `npm@latest`. Node 22 ships npm 10.9.x, which predates OIDC
+  support (needs >= 11.5.1); without this the publish fails with an auth error that mentions
+  nothing about versions.
+
+### Fixed
+
+- The version is now defined once in `src/version.ts` and read by the CLI banner, the User-Agent,
+  and the MCP client identity. Previously it was duplicated across three files, so a release could
+  ship reporting the wrong version. A test asserts it matches `package.json`.
+
 ## [0.1.0] - 2026-08-08
 
 First release.
@@ -40,5 +58,6 @@ First release.
   project.
 - No telemetry, no phone-home, no postinstall scripts.
 
-[Unreleased]: https://github.com/sp3ak/safenode-mcp-gateway/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/sp3ak/safenode-mcp-gateway/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/sp3ak/safenode-mcp-gateway/releases/tag/v0.1.1
 [0.1.0]: https://github.com/sp3ak/safenode-mcp-gateway/releases/tag/v0.1.0

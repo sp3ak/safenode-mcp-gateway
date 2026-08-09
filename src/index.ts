@@ -13,8 +13,9 @@ import { ConfigError, loadConfigFile } from './config.js';
 import { Gateway } from './gateway.js';
 import { logToStderr } from './logging.js';
 import { buildEnvelope, SafeNodeEvaluator } from './policy.js';
+import { VERSION } from './version.js';
 
-export const VERSION = '0.1.0';
+export { VERSION };
 
 const USAGE = `safenode-mcp-gateway ${VERSION}
 
