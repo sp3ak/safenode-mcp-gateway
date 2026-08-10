@@ -12,7 +12,11 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
 };
 const server = JSON.parse(readFileSync(join(root, 'server.json'), 'utf8')) as {
   name: string;
+  title: string;
+  description: string;
+  websiteUrl: string;
   version: string;
+  repository: { url: string };
   packages: Array<{ identifier: string; version: string }>;
 };
 
@@ -46,5 +50,31 @@ describe('MCP registry manifest', () => {
   it('claims a namespace we can actually authenticate for', () => {
     // GitHub OIDC auth only permits io.github.<owner>/*.
     expect(server.name.startsWith('io.github.sp3ak/')).toBe(true);
+  });
+});
+
+describe('MCP registry schema limits', () => {
+  // These mirror server.schema.json. The registry only enforces them at publish time, which is
+  // after npm has already published and cannot be undone — a 145-character description cost a
+  // release once. Check them here, where failing is free.
+  it('description is within 100 characters', () => {
+    expect(server.description.length).toBeGreaterThan(0);
+    expect(server.description.length).toBeLessThanOrEqual(100);
+  });
+
+  it('title is within 100 characters', () => {
+    expect(server.title.length).toBeGreaterThan(0);
+    expect(server.title.length).toBeLessThanOrEqual(100);
+  });
+
+  it('name is within 200 characters and matches the required pattern', () => {
+    expect(server.name.length).toBeLessThanOrEqual(200);
+    expect(server.name.length).toBeGreaterThanOrEqual(3);
+    expect(server.name).toMatch(/^[a-zA-Z0-9.-]+\/[a-zA-Z0-9._-]+$/);
+  });
+
+  it('urls are absolute', () => {
+    expect(() => new URL(server.websiteUrl)).not.toThrow();
+    expect(() => new URL(server.repository.url)).not.toThrow();
   });
 });

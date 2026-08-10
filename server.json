@@ -1,7 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.sp3ak/safenode-mcp-gateway",
-  "description": "Policy enforcement proxy for MCP tool calls. Evaluates every call against SafeNode before forwarding; a denial never reaches the downstream server.",
+  "title": "SafeNode MCP Gateway",
+  "description": "Policy proxy for MCP tool calls. A denied call never reaches the downstream server.",
+  "websiteUrl": "https://safenode.tech",
   "repository": {
     "url": "https://github.com/sp3ak/safenode-mcp-gateway",
     "source": "github"
