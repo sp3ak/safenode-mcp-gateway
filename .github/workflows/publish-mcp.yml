@@ -1,0 +1,68 @@
+# MCP Registry publishing, deliberately separate from the npm publish in ci.yml.
+#
+# These were one job. That was a mistake: npm publishes are irreversible, so once npm succeeds the
+# job can never be re-run — a registry failure after a successful npm publish left no way to retry
+# except cutting a new version. Splitting them means the registry step can be re-run on its own
+# with workflow_dispatch.
+#
+# No `environment:` here on purpose. An environment changes the OIDC subject claim from
+# `repo:OWNER/REPO:ref:refs/tags/vX` to `repo:OWNER/REPO:environment:NAME`, and the registry
+# matches on the former. ci.yml's npm job does need its environment, which is exactly why these
+# cannot share a job.
+
+name: publish-mcp
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to register (defaults to package.json)"
+        required: false
+
+jobs:
+  publish-mcp:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC auth to the registry
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      # The registry verifies ownership by fetching the package from npm and checking its `mcpName`
+      # field. npm's CDN takes a little while to serve a new version, so publishing the registry
+      # entry immediately after the npm publish races that propagation.
+      - name: Wait for the npm package to be visible
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          for i in $(seq 1 30); do
+            FOUND="$(npm view safenode-mcp-gateway@"$VERSION" version 2>/dev/null || true)"
+            if [ "$FOUND" = "$VERSION" ]; then
+              echo "safenode-mcp-gateway@$VERSION is visible on npm"
+              MCP_NAME="$(npm view safenode-mcp-gateway@"$VERSION" mcpName 2>/dev/null || true)"
+              echo "mcpName as published: '${MCP_NAME}'"
+              if [ -z "$MCP_NAME" ]; then
+                echo "The published package has no mcpName field. The registry will reject this." >&2
+                exit 1
+              fi
+              exit 0
+            fi
+            echo "  attempt $i: not visible yet, waiting 10s"
+            sleep 10
+          done
+          echo "npm did not serve version $VERSION within 5 minutes" >&2
+          exit 1
+
+      - name: Install mcp-publisher
+        run: curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Authenticate to the MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish
+        run: ./mcp-publisher publish

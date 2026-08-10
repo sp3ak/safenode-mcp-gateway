@@ -52,15 +52,8 @@ jobs:
       - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
-      # No NODE_AUTH_TOKEN: authentication comes from the OIDC trusted publisher configured on
-      # npmjs.com for this package (sp3ak/safenode-mcp-gateway, ci.yml, environment "npm").
-      # The `environment: npm` above is part of that claim — remove it and OIDC stops matching.
-      - run: npm publish --provenance --access public
-
-      # --- MCP Registry -------------------------------------------------------------------
-      # The registry stores metadata only, so it must run after the npm publish above: it
-      # verifies that the npm package's `mcpName` field matches the server name claimed here.
-      # Also OIDC, also no stored credential.
+      # Runs BEFORE the publish. npm publishes are irreversible, so every check that can fail the
+      # release has to fail while failing is still free.
       - name: Guard against server.json drifting from package.json
         run: |
           TAG="${GITHUB_REF_NAME#v}"
@@ -76,10 +69,12 @@ jobs:
           [ "$MCP_NAME" = "$SERVER_NAME" ] || { echo "package.json mcpName $MCP_NAME != server.json name $SERVER_NAME" >&2; fail=1; }
           exit $fail
 
-      - name: Install mcp-publisher
-        run: curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+      # No NODE_AUTH_TOKEN: authentication comes from the OIDC trusted publisher configured on
+      # npmjs.com for this package (sp3ak/safenode-mcp-gateway, ci.yml, environment "npm").
+      # The `environment: npm` above is part of that claim — remove it and OIDC stops matching.
+      - run: npm publish --provenance --access public
 
-      - name: Publish to the MCP Registry
-        run: |
-          ./mcp-publisher login github-oidc
-          ./mcp-publisher publish
+      # MCP Registry publishing lives in publish-mcp.yml, not here. Coupling them meant a registry
+      # failure after a successful npm publish could never be retried, because npm rejects a
+      # duplicate version. The registry job also must not run under an environment: that changes
+      # the OIDC subject claim, and the registry matches on the ref-based one.
