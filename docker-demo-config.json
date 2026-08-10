@@ -1,0 +1,13 @@
+{
+  "_comment": "Demo config used by the Docker image's default command, so the gateway starts and answers introspection without any setup. It proxies the bundled echo server. The API key is deliberately not a real one: tools/list passes through, and any actual tool call is denied by the fail_closed policy because SafeNode cannot be reached. Mount your own config over this for real use.",
+  "apiKey": "sn_demo_key_not_valid_for_evaluation",
+  "failMode": "fail_closed",
+  "payloadMode": "redacted",
+  "servers": [
+    {
+      "name": "demo",
+      "command": "node",
+      "args": ["examples/echo-server.mjs"]
+    }
+  ]
+}

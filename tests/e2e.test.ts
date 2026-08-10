@@ -105,6 +105,25 @@ describe('end to end over real stdio transports', () => {
     expect(result.content[0]!.text).toMatch(/Blocked by policy/i);
   }, 30000);
 
+  it('starts and answers introspection using the shipped demo config', async () => {
+    // This is what a registry health check does: start the server with no setup, initialize, and
+    // list tools. The Docker image's default command uses this same config, so if this breaks the
+    // listing check breaks with it — and the failure would only show up on someone else's CI.
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [gatewayEntry, '--config', join(root, 'docker-demo-config.json')],
+      // The demo config points at examples/echo-server.mjs relatively, matching the Docker WORKDIR.
+      cwd: root,
+      stderr: 'ignore',
+    });
+    const client = new Client({ name: 'introspection-check', version: '1.0.0' }, { capabilities: {} });
+    await client.connect(transport);
+    open = client;
+
+    const listed = await client.listTools();
+    expect(listed.tools.map((t) => t.name)).toContain('echo');
+  }, 30000);
+
   it('a bypassed tool still reaches the downstream server under fail-closed', async () => {
     open = await connectGateway(
       writeConfig({ failMode: 'fail_closed', tools: { echo: { bypass: true } } }),

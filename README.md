@@ -249,6 +249,32 @@ Bypassed tools add nothing.
 A measured p99 for the evaluate endpoint is not published yet, because it has not been measured
 under realistic load. When it has been, it will go here and in the docs rather than being estimated.
 
+## Docker
+
+```bash
+docker build -t safenode-mcp-gateway .
+```
+
+Running it with no arguments starts against a bundled demo config that proxies an included echo
+server, so you can see the proxy work without any setup:
+
+```bash
+docker run -i --rm safenode-mcp-gateway
+```
+
+The demo key is a placeholder, so `tools/list` passes through while any real tool call is denied by
+the `fail_closed` policy. For real use, mount your own config and supply a key:
+
+```bash
+docker run -i --rm \
+  -e SAFENODE_API_KEY=sn_... \
+  -v /path/to/safenode-gateway.json:/app/config.json \
+  safenode-mcp-gateway --config /app/config.json
+```
+
+`-i` is required. MCP speaks JSON-RPC over stdio, so without stdin attached the gateway has nothing
+to talk to.
+
 ## Requirements
 
 Node 18+. One runtime dependency: `@modelcontextprotocol/sdk`.
