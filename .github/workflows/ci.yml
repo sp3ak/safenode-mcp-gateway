@@ -56,3 +56,30 @@ jobs:
       # npmjs.com for this package (sp3ak/safenode-mcp-gateway, ci.yml, environment "npm").
       # The `environment: npm` above is part of that claim — remove it and OIDC stops matching.
       - run: npm publish --provenance --access public
+
+      # --- MCP Registry -------------------------------------------------------------------
+      # The registry stores metadata only, so it must run after the npm publish above: it
+      # verifies that the npm package's `mcpName` field matches the server name claimed here.
+      # Also OIDC, also no stored credential.
+      - name: Guard against server.json drifting from package.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          SERVER_VERSION="$(node -p "require('./server.json').version")"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          PKG_ENTRY="$(node -p "require('./server.json').packages[0].version")"
+          MCP_NAME="$(node -p "require('./package.json').mcpName")"
+          SERVER_NAME="$(node -p "require('./server.json').name")"
+          fail=0
+          [ "$TAG" = "$PKG_VERSION" ] || { echo "tag v$TAG != package.json $PKG_VERSION" >&2; fail=1; }
+          [ "$SERVER_VERSION" = "$PKG_VERSION" ] || { echo "server.json version $SERVER_VERSION != package.json $PKG_VERSION" >&2; fail=1; }
+          [ "$PKG_ENTRY" = "$PKG_VERSION" ] || { echo "server.json packages[0].version $PKG_ENTRY != package.json $PKG_VERSION" >&2; fail=1; }
+          [ "$MCP_NAME" = "$SERVER_NAME" ] || { echo "package.json mcpName $MCP_NAME != server.json name $SERVER_NAME" >&2; fail=1; }
+          exit $fail
+
+      - name: Install mcp-publisher
+        run: curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Publish to the MCP Registry
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish

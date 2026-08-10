@@ -1,6 +1,7 @@
 {
   "name": "safenode-mcp-gateway",
-  "version": "0.1.1",
+  "version": "0.1.2",
+  "mcpName": "io.github.sp3ak/safenode-mcp-gateway",
   "description": "MCP proxy that enforces SafeNode policy on every tool call. The agent cannot route around it.",
   "keywords": [
     "mcp",

@@ -9,6 +9,21 @@ While the version is below 1.0.0, minor releases may change the config schema.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-08-09
+
+Listed in the official MCP Registry, so MCP clients and agents can discover the gateway.
+
+### Added
+
+- `server.json` manifest and an `mcpName` field in `package.json`, claiming
+  `io.github.sp3ak/safenode-mcp-gateway`. The registry verifies ownership by reading `mcpName` back
+  off the published npm package, so the two must agree.
+- The release workflow publishes to the MCP Registry after npm, authenticating with GitHub OIDC —
+  no stored credential, same as the npm publish.
+- Tests asserting `server.json`, `package.json` and `src/version.ts` agree on version, package
+  identifier and server name. The registry rejects a mismatch *after* npm has already published,
+  and an npm publish cannot be undone, so this has to fail locally instead.
+
 ## [0.1.1] - 2026-08-09
 
 No functional change to the gateway itself. Released to verify that publishing works over OIDC
@@ -58,6 +73,7 @@ First release.
   project.
 - No telemetry, no phone-home, no postinstall scripts.
 
-[Unreleased]: https://github.com/sp3ak/safenode-mcp-gateway/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/sp3ak/safenode-mcp-gateway/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/sp3ak/safenode-mcp-gateway/releases/tag/v0.1.2
 [0.1.1]: https://github.com/sp3ak/safenode-mcp-gateway/releases/tag/v0.1.1
 [0.1.0]: https://github.com/sp3ak/safenode-mcp-gateway/releases/tag/v0.1.0

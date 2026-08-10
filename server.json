@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.sp3ak/safenode-mcp-gateway",
+  "description": "Policy enforcement proxy for MCP tool calls. Evaluates every call against SafeNode before forwarding; a denial never reaches the downstream server.",
+  "repository": {
+    "url": "https://github.com/sp3ak/safenode-mcp-gateway",
+    "source": "github"
+  },
+  "version": "0.1.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "safenode-mcp-gateway",
+      "version": "0.1.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "SAFENODE_API_KEY",
+          "description": "SafeNode API key. Free tier at https://safenode.tech — no card required.",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "SAFENODE_BASE_URL",
+          "description": "Override the SafeNode API base URL. Defaults to https://safenode.tech.",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
