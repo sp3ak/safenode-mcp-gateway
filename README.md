@@ -275,6 +275,13 @@ docker run -i --rm \
 `-i` is required. MCP speaks JSON-RPC over stdio, so without stdin attached the gateway has nothing
 to talk to.
 
+## Agent skill
+
+[`skill/safenode-mcp-gateway/SKILL.md`](skill/safenode-mcp-gateway/SKILL.md) teaches an agent to set
+the gateway up for you, moving your existing servers behind it, and how to behave when a call is
+blocked or held for review. Drop the folder into your agent's skills directory (for Claude Code,
+`~/.claude/skills/`).
+
 ## Requirements
 
 Node 18+. One runtime dependency: `@modelcontextprotocol/sdk`.
