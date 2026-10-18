@@ -277,10 +277,10 @@ to talk to.
 
 ## Agent skill
 
-[`skill/safenode-mcp-gateway/SKILL.md`](skill/safenode-mcp-gateway/SKILL.md) teaches an agent to set
+[`SKILL.md`](SKILL.md) teaches an agent to set
 the gateway up for you, moving your existing servers behind it, and how to behave when a call is
 blocked or held for review. Drop the folder into your agent's skills directory (for Claude Code,
-`~/.claude/skills/`).
+`~/.claude/skills/safenode-mcp-gateway/`). The policy-authoring companion is in [`skill/safenode-policies/`](skill/safenode-policies/SKILL.md).
 
 ## Requirements
 
