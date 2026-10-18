@@ -279,7 +279,7 @@ to talk to.
 
 [`SKILL.md`](SKILL.md) teaches an agent to set
 the gateway up for you, moving your existing servers behind it, and how to behave when a call is
-blocked or held for review. Drop the folder into your agent's skills directory (for Claude Code,
+blocked or held for review. Copy it into a folder in your agent's skills directory (for Claude Code,
 `~/.claude/skills/safenode-mcp-gateway/`). The policy-authoring companion is in [`skill/safenode-policies/`](skill/safenode-policies/SKILL.md).
 
 ## Requirements
